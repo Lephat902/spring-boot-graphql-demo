@@ -4,22 +4,33 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
-public record Author(String id, String firstName, String lastName) {
+import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
+@Builder
+public class Author {
+    private String id;
+    private String firstName;
+    private String lastName;
+
     private static List<Author> authors = Arrays.asList(
-            new Author("author-1", "Joshua", "Bloch"),
-            new Author("author-2", "Douglas", "Adams"),
-            new Author("author-3", "Bill", "Bryson"));
+            Author.builder().id("author-1").firstName("Joshua").lastName("Bloch").build(),
+            Author.builder().id("author-2").firstName("Douglas").lastName("Adams").build(),
+            Author.builder().id("author-3").firstName("Bill").lastName("Bryson").build());
 
     public static Author getById(String id) {
         return authors.stream()
-                .filter(author -> author.id().equals(id))
+                .filter(author -> author.getId().equals(id))
                 .findFirst()
                 .orElse(null);
     }
 
     public static List<Author> getByIds(Collection<String> ids) {
         return authors.stream()
-                .filter(author -> ids.contains(author.id()))
+                .filter(author -> ids.contains(author.getId()))
                 .toList();
     }
 }

@@ -14,15 +14,17 @@ import org.springframework.stereotype.Controller;
 import com.example.graphqlserver.entities.Author;
 import com.example.graphqlserver.entities.Book;
 
+import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Mono;
 
 @Controller
+@Slf4j
 public class BookController {
     public BookController(BatchLoaderRegistry registry) {
         registry.forTypePair(String.class, Author.class).registerMappedBatchLoader((authorIds, env) -> {
             var authors = Author.getByIds(authorIds);
             var authorMap = authors.stream()
-                    .collect(Collectors.toMap(Author::id, author -> author));
+                    .collect(Collectors.toMap(Author::getId, author -> author));
             return Mono.just(authorMap);
         });
     }
@@ -39,6 +41,9 @@ public class BookController {
 
     @SchemaMapping
     public CompletableFuture<Author> author(Book book, DataLoader<String, Author> loader) {
-        return loader.load(book.authorId());
+        if (book.getAuthor() != null)
+            return CompletableFuture.completedFuture(book.getAuthor());
+        log.info("USE LOADER: " + book.getAuthorId());
+        return loader.load(book.getAuthorId());
     }
 }
