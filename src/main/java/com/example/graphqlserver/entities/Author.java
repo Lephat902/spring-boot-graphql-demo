@@ -15,6 +15,7 @@ public class Author {
     private String id;
     private String firstName;
     private String lastName;
+    private List<Book> books;
 
     private static List<Author> authors = Arrays.asList(
             Author.builder().id("author-1").firstName("Joshua").lastName("Bloch").build(),

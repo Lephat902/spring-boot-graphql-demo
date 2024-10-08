@@ -2,7 +2,6 @@ package com.example.graphqlserver.controller;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
-import java.util.stream.Collectors;
 
 import org.dataloader.DataLoader;
 import org.springframework.graphql.data.method.annotation.Argument;
@@ -19,32 +18,31 @@ import reactor.core.publisher.Mono;
 
 @Controller
 @Slf4j
-public class BookController {
-    public BookController(BatchLoaderRegistry registry) {
-        registry.forTypePair(String.class, Author.class)
+public class AuthorController {
+    @SuppressWarnings("unchecked")
+    public AuthorController(BatchLoaderRegistry registry) {
+        registry.forTypePair(String.class, (Class<List<Book>>) (Class<?>) List.class)
                 .registerMappedBatchLoader((authorIds, env) -> {
                     log.info("USE DATA LOADER FOR AUTHORS: " + authorIds);
-                    var authors = Author.getByIds(authorIds);
-                    var authorMap = authors.stream()
-                            .collect(Collectors.toMap(Author::getId, author -> author));
-                    return Mono.just(authorMap);
+                    var authorToBooksMap = Book.getByAuthorIds(authorIds);
+                    return Mono.just(authorToBooksMap);
                 });
     }
 
     @QueryMapping
-    public List<Book> books() {
-        return Book.getAll();
+    public List<Author> authors(@Argument List<String> ids) {
+        return Author.getByIds(ids);
     }
 
     @QueryMapping
-    public Book bookById(@Argument String id) {
-        return Book.getById(id);
+    public Author authorById(@Argument String id) {
+        return Author.getById(id);
     }
 
     @SchemaMapping
-    public CompletableFuture<Author> author(Book book, DataLoader<String, Author> loader) {
-        if (book.getAuthor() != null)
-            return CompletableFuture.completedFuture(book.getAuthor());
-        return loader.load(book.getAuthorId());
+    public CompletableFuture<List<Book>> books(Author author, DataLoader<String, List<Book>> loader) {
+        if (author.getBooks() != null)
+            return CompletableFuture.completedFuture(author.getBooks());
+        return loader.load(author.getId());
     }
 }
