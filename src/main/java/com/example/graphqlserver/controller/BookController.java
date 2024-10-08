@@ -1,5 +1,7 @@
 package com.example.graphqlserver.controller;
 
+import java.util.List;
+
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
 import org.springframework.graphql.data.method.annotation.SchemaMapping;
@@ -10,6 +12,11 @@ import com.example.graphqlserver.entities.Book;
 
 @Controller
 public class BookController {
+    @QueryMapping
+    public List<Book> books() {
+        return Book.getAll();
+    }
+
     @QueryMapping
     public Book bookById(@Argument String id) {
         return Book.getById(id);
