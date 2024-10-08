@@ -1,10 +1,10 @@
 package com.example.graphqlserver.entities;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
 public record Author(String id, String firstName, String lastName) {
-
     private static List<Author> authors = Arrays.asList(
             new Author("author-1", "Joshua", "Bloch"),
             new Author("author-2", "Douglas", "Adams"),
@@ -17,7 +17,7 @@ public record Author(String id, String firstName, String lastName) {
                 .orElse(null);
     }
 
-    public static List<Author> getByIds(List<String> ids) {
+    public static List<Author> getByIds(Collection<String> ids) {
         return authors.stream()
                 .filter(author -> ids.contains(author.id()))
                 .toList();
